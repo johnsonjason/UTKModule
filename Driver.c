@@ -59,18 +59,25 @@ void SetProtection(PMDL* MdlArray, SIZE_T MdlArraySize, LONG Protection)
 
 void ProbeLockPagesUser(PMDL* MdlArray, SIZE_T MdlArraySize, BOOLEAN Lock)
 {
-	if (Lock)
+	__try
 	{
-		for (SIZE_T mdl = 0; mdl < MdlArraySize; mdl++)
-			MmProbeAndLockPages(MdlArray[mdl], UserMode, IoReadAccess);
+		if (Lock)
+		{
+			for (SIZE_T mdl = 0; mdl < MdlArraySize; mdl++)
+				MmProbeAndLockPages(MdlArray[mdl], UserMode, IoReadAccess);
+		}
+		else
+		{
+			for (SIZE_T mdl = 0; mdl < MdlArraySize; mdl++)
+				MmUnlockPages(MdlArray[mdl]);
+		}
 	}
-	else
+	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
-		for (SIZE_T mdl = 0; mdl < MdlArraySize; mdl++)
-			MmUnlockPages(MdlArray[mdl]);
+		DbgPrint("Probe failed - access violation");
+		return;
 	}
 }
-
 VOID GetImportAddressTable(PVOID ModuleBase)
 {
 	PUSERMODE_IMAGE_HEADER virtual_process_info = (PUSERMODE_IMAGE_HEADER)ModuleBase;
