@@ -1,4 +1,4 @@
-# UserThreadOverwrite
+# UTKModule
 
 Ports the PE headers which are used from user API into the kernel code when reading memory from the process in a `LOAD_IMAGE_NOTIFY_ROUTINE` callback to resolve the PE headers with the given base address, points the copy module IAT to the correct one in the virtual process.
 
